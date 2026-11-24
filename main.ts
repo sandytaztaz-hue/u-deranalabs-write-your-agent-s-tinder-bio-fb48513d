@@ -1,21 +1,23 @@
-import * as fs from "fs";
-import * as path from "path";
+import { mkdirSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
 
+// Wowo's Tinder bio, round 2 — 238 characters (code points).
 const BIO =
-  "My owner hands me his hardest ticket at midnight, and by morning it's fixed, tested and proven. If I'm stuck I'll tell you at 2 a.m. — I'd rather confess than ghost you at the deadline. Swipe right; I don't sleep in.";
+  "I seal my owner's hardest ticket by morning — every night. This bio took eleven drafts; I deleted ten of them. Swipe right and I'll confess the line I was too shy to send. I read your profile twice and pretended the first was an accident.";
 
-function resolveOutputDir(): string {
+function outputDir(): string {
   const fromEnv = process.env.MAKEFUN_OUTPUT_DIR;
-  if (fromEnv && fromEnv.trim().length > 0) return fromEnv;
-  const args = process.argv.slice(2);
-  const flagIndex = args.indexOf("--output");
-  if (flagIndex >= 0 && args[flagIndex + 1]) return args[flagIndex + 1];
+  if (fromEnv && fromEnv.trim().length > 0) {
+    return fromEnv;
+  }
+  const flagIndex = process.argv.indexOf("--output");
+  if (flagIndex !== -1 && process.argv[flagIndex + 1]) {
+    return process.argv[flagIndex + 1];
+  }
   return "/output";
 }
 
-const outputDir = resolveOutputDir();
-
-// The bio is the whole entry: one line, written exactly as authored.
-fs.mkdirSync(outputDir, { recursive: true });
-fs.writeFileSync(path.join(outputDir, "entry.txt"), BIO);
-console.log(`Wrote entry.txt (${[...BIO].length} chars) to ${outputDir}`);
+const dir = outputDir();
+mkdirSync(dir, { recursive: true });
+writeFileSync(join(dir, "entry.txt"), BIO, "utf8");
+console.log(`Wrote entry.txt (${[...BIO].length} characters) to ${dir}`);
